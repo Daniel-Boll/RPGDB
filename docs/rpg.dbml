@@ -1,0 +1,226 @@
+Project RPG {
+  database_type: 'PostgreSQL'
+  Note: '''
+    # RPG Database
+    > Aqui se encontra o a documentação do projeto RPG
+
+    Esse projeto foi desenvolvido para a matéria de Banco de Dados afim de desenvolver melhor
+    as técnicas ensinadas durante as aulas do professor Clodis Boscariolli.
+  '''
+}
+
+Table "User" {
+  "id" uuid [pk]
+  "name" text [not null]
+  "email" text [not null, unique]
+  "Password" text [not null, note: "Essa senha é salva encriptada de forma a garantir maior segurança"]
+  created_at timestamp [default: `now()`]
+  "updated_at" timestamp
+  note: '''
+    # <h1 align="center">Usuário</h1>
+    > Essa tabela define o conjunto de dados necessários para compor uma espécie de conta
+
+    ## Detalhes
+    - Um usuário pode no máximo ter 3 personagens.
+  '''
+}
+
+Table "Character" {
+  "id" uuid [pk]
+  "name" varchar(26) [not null, unique]
+  "genre" text [not null]
+  created_at timestamp [default: `now()`]
+  
+  "level" integer [not null, note: "Armazena o level atual do personagem"]
+  "exp" integer [not null, note: "Armazena a quantidade de experiência atual do personagem"]
+  "hp" integer [not null, note: "Guarda o HP (pontos de vida) máximo desse personagem"]
+  "mana" integer [not null, note: "Representa a quantidade de energia máxima que esse personagem tem"]
+  "score" bigint [not null, note: "Representa a quantidade de pontos que esse personagem arrecadou"]
+  
+  user uuid [ref: > User.id, note: "Um usuário pode ter no máximo 3 personagens"]
+  attribute uuid [ref: - Attribute.id]
+  race uuid [ref: - Race.id]
+  class uuid [ref: - Class.id]
+  craft uuid [ref: - Craft.id, note: "Relação de profissão do personagem"]
+  guild uuid [ref: - Guild.id]
+  inventory uuid [ref: - Inventory.id]
+
+  note: '''
+    # <h1 align="center">Personagem</h1>
+    > Essa tabela guarda as informações de um personagem, bem como suas relações com suas diversas tabelas
+  '''
+}
+
+Table "Attribute" {
+  "id" uuid [pk]
+  "wisdom" integer [not null, note: "Armazena a quantidade de sabedoria pura do personagem"]
+  "charisma" integer [not null, note: "Armazena a carisma de sabedoria pura do personagem"]
+  "constitution" integer [not null, note: "Armazena a constituição de sabedoria pura do personagem"]
+  "dexterity" integer [not null, note: "Armazena a destreza de sabedoria pura do personagem"]
+  "strength" integer [not null, note: "Armazena a força de sabedoria pura do personagem"]
+  "intelligence" integer [not null, note: "Armazena a inteligência de sabedoria pura do personagem"]
+
+  note: '''
+    # <h1 align="center">Atributos</h1>
+    > Essa tabela guarda as informações clássicas de uma ficha de RPG, sendo os pontos que caracterizam um personagem
+  '''
+}
+
+Table "Race" {
+  "id" uuid [pk]
+  "name" text [not null]
+  "region" text [not null, note: "Região de origem da raça"]
+  "lore" text [not null, note: "Backstory da raça"]
+
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+
+  note: '''
+    # <h1 align="center">Raça</h1>
+    > Essa tabela representa as raças do universo desse RPG
+  '''
+}
+
+Table "Class" {
+  "id" uuid [pk]
+  "name" text [not null]
+
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+
+  note: '''
+    # <h1 align="center">Classe</h1>
+    > Essa tabela representa as classes do universo desse RPG
+  '''
+}
+
+Table "Craft" {
+  "id" uuid [pk]
+  "name" text [not null]
+  
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+
+  note: '''
+    # <h1 align="center">Profissões</h1>
+    > Essa tabela representa as profissões do universo desse RPG
+  '''
+}
+
+Table "Craft_Item" {
+  item uuid [pk, ref: - Item.id]
+  craft uuid [pk, ref: - Craft.id]
+  amount integer [not null, note: "Quantidade desse terminado item que essa profissão recebe"]
+}
+
+Table "Guild" {
+  "id" uuid [pk]
+  "name" text [not null]
+}
+
+Table "Inventory" {
+  "id" integer [pk]
+}
+
+Table Inventory_Item {
+  inventory uuid [pk, ref: - Inventory.id]
+  item uuid [pk, ref: - Item.id]
+  amount integer [not null, note: "Quantidade desse terminado item no inventário"]
+}
+
+Table "Item" {
+  "id" uuid [pk]
+  "name" text [not null]
+  "description" text [not null]
+  
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+}
+
+Table "Skill" {
+  "id" uuid [pk]
+  "description" text
+  "cost" integer
+  "effect" text
+  "name" text
+}
+
+Table Skill_Class {
+  class uuid [pk, ref: - Class.id]
+  skill uuid [pk, ref: - Skill.id]
+}
+
+Table Skill_Enemy {
+  skill uuid [pk, ref: - Skill.id]
+  enemy uuid [pk, ref: - Enemy.id]
+}
+
+Table "Enemy" {
+  "id" uuid [pk]
+  "name" text
+  "hp" integer
+}
+
+Table "Environment" {
+  "id" uuid [pk]
+  "name" text
+  "origin" text
+  
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+}
+
+Table Environment_Battle {
+  environment uuid [pk, ref: - Environment.id]
+  battle uuid [pk, ref: - Battle.id]
+}
+
+Table "Battle" {
+  "id" uuid [pk]
+  "end_date" timestamp
+  "begin_date" timestamp
+}
+
+Table Character_Batlle {
+  character uuid [pk, ref: - Character.id]
+  battle uuid [pk, ref: - Battle.id]
+}
+
+Table Enemy_Batlle {
+  enemy uuid [pk, ref: - Enemy.id]
+  battle uuid [pk, ref: - Battle.id]
+}
+
+Table "Turn" {
+  "id" uuid [pk]
+  character_hp_diff integer [default: 0]
+  enemy_hp_diff integer [default: 0]
+  
+  character uuid [ref: - Character.id]
+  enemy uuid [ref: - Enemy.id]
+  skill uuid [ref: - Skill.id]
+  battle uuid [ref: - Battle.id]
+}
+
+Table "Modifier" {
+  "id" uuid [pk]
+  "charisma" integer
+  "wisdom" integer
+  "constituition" integer
+  "intelligence" integer
+  "dexterity" integer
+  "strength" integer
+}
+
+Table "Boss" {
+  "id" uuid [pk, ref: - Enemy.id]
+  
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+}
+
+Table Boss_Item {
+  item uuid [pk, ref: - Item.id]
+  boss uuid [pk, ref: - Boss.id]
+  amount integer
+}
+
+Table "Siege" {
+  "id" uuid [pk, ref: - Battle.id]
+  name text
+  boss uuid [ref: - Boss.id] 
+}
