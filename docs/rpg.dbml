@@ -9,6 +9,41 @@ Project RPG {
   '''
 }
 
+TableGroup user_zone {
+  User
+  Character
+}
+
+TableGroup character_zone {
+  Attribute
+  Race 
+  Class
+  Craft
+  Inventory
+  Guild
+  Item
+}
+
+TableGroup battle_zone {
+  Environment
+  Enemy
+  Boss
+  Siege
+  Modifier
+}
+
+TableGroup relations {
+  Inventory_Item
+  Skill_Class
+  Skill_Race
+  Skill_Enemy
+  Craft_Item
+  Environment_Battle
+  Boss_Item
+  Character_Battle
+  Enemy_Battle
+}
+
 Table "User" {
   "id" uuid [pk]
   "name" text [not null]
@@ -53,12 +88,12 @@ Table "Character" {
 
 Table "Attribute" {
   "id" uuid [pk]
-  "wisdom" integer [not null, note: "Armazena a quantidade de sabedoria pura do personagem"]
-  "charisma" integer [not null, note: "Armazena a carisma de sabedoria pura do personagem"]
-  "constitution" integer [not null, note: "Armazena a constituição de sabedoria pura do personagem"]
-  "dexterity" integer [not null, note: "Armazena a destreza de sabedoria pura do personagem"]
-  "strength" integer [not null, note: "Armazena a força de sabedoria pura do personagem"]
-  "intelligence" integer [not null, note: "Armazena a inteligência de sabedoria pura do personagem"]
+  "wisdom" integer [not null, default: 0, note: "Armazena a quantidade de sabedoria pura do personagem"]
+  "charisma" integer [not null, default: 0, note: "Armazena a carisma de sabedoria pura do personagem"]
+  "constitution" integer [not null, default: 0, note: "Armazena a constituição de sabedoria pura do personagem"]
+  "dexterity" integer [not null, default: 0, note: "Armazena a destreza de sabedoria pura do personagem"]
+  "strength" integer [not null, default: 0, note: "Armazena a força de sabedoria pura do personagem"]
+  "intelligence" integer [not null, default: 0, note: "Armazena a inteligência de sabedoria pura do personagem"]
 
   note: '''
     # <h1 align="center">Atributos</h1>
@@ -113,10 +148,20 @@ Table "Craft_Item" {
 Table "Guild" {
   "id" uuid [pk]
   "name" text [not null]
+
+  note: '''
+    # <h1 align="center">Guilda</h1>
+    > Essa tabela representa grupos/alianças que os personagens podem fazer para se ajudarem em eventos especiais
+  '''
 }
 
 Table "Inventory" {
   "id" integer [pk]
+
+  note: '''
+    # <h1 align="center">Inventário</h1>
+    > Essa tabela representa o sistema de armazenamento de itens do personagem
+  '''
 }
 
 Table Inventory_Item {
@@ -131,18 +176,33 @@ Table "Item" {
   "description" text [not null]
   
   modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+
+  note: '''
+    # <h1 align="center">Item</h1>
+    > Essa tabela representa um item, um artefato que propões alterações de atributos para os personagens
+  '''
 }
 
 Table "Skill" {
   "id" uuid [pk]
-  "description" text
-  "cost" integer
-  "effect" text
-  "name" text
+  "name" text [not null]
+  "description" text [not null, note: "A descrição de utilização e efeitos da habilidade"]
+  "cost" integer [not null, note: "Determina o custo de utilização de determinada habilidade"]
+  "effect" text [not null, note: "Um balança de consequências do uso da habilidade"]
+
+  note: '''
+    # <h1 align="center">Habilidade</h1>
+    > Habilidades que podem ser conjuradas por um personagem ou inimigo
+  '''
 }
 
 Table Skill_Class {
   class uuid [pk, ref: - Class.id]
+  skill uuid [pk, ref: - Skill.id]
+}
+
+Table Skill_Race {
+  race uuid [pk, ref: - Race.id]
   skill uuid [pk, ref: - Skill.id]
 }
 
@@ -153,16 +213,28 @@ Table Skill_Enemy {
 
 Table "Enemy" {
   "id" uuid [pk]
-  "name" text
-  "hp" integer
+  "name" text [not null]
+  "hp" integer [not null, note: "Guarda o HP (pontos de vida) máximo desse inimigo"]
+
+  attribute uuid [ref: - Attribute.id]
+
+  note: '''
+    # <h1 align="center">Inimigo</h1>
+    > Essa tabela descreve um inimigo e seus atributos
+  '''
 }
 
 Table "Environment" {
   "id" uuid [pk]
-  "name" text
-  "origin" text
+  "name" text [not null]
+  "region" text [not null, note: "Região onde se encontra esse ambiente"]
   
-  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+  modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera nos personagens e inimigos"]
+
+  note: '''
+    # <h1 align="center">Ambiente</h1>
+    > Essa tabela resulta em uma região de batalha que confere buffs/debuffs aos atributos de personagens e inimigos
+  '''
 }
 
 Table Environment_Battle {
@@ -174,53 +246,81 @@ Table "Battle" {
   "id" uuid [pk]
   "end_date" timestamp
   "begin_date" timestamp
+
+  note: '''
+    # <h1 align="center">Batalha</h1>
+    > Essa tabela guarda eventos de batalhas do RPG
+  '''
 }
 
-Table Character_Batlle {
+Table Character_Battle {
   character uuid [pk, ref: - Character.id]
   battle uuid [pk, ref: - Battle.id]
 }
 
-Table Enemy_Batlle {
+Table Enemy_Battle {
   enemy uuid [pk, ref: - Enemy.id]
   battle uuid [pk, ref: - Battle.id]
 }
 
 Table "Turn" {
   "id" uuid [pk]
-  character_hp_diff integer [default: 0]
-  enemy_hp_diff integer [default: 0]
+  character_hp_diff integer [default: 0, note: "Dedução ou soma na vida do personagem a ser aplicada nesse turno"]
+  enemy_hp_diff integer [default: 0, note: "Dedução ou soma na vida do inimigo a ser aplicada nesse turno"]
+
+  character_mana_diff integer [default: 0, note: "Dedução ou soma na mana do personagem a ser aplicada nesse turno"]
   
   character uuid [ref: - Character.id]
   enemy uuid [ref: - Enemy.id]
   skill uuid [ref: - Skill.id]
   battle uuid [ref: - Battle.id]
+
+  note: '''
+    # <h1 align="center">Turno</h1>
+    > Essa tabela guarda todos os turnos de uma determinada batalha, sendo um log de danos e curas realizadas
+  '''
 }
 
 Table "Modifier" {
   "id" uuid [pk]
-  "charisma" integer
-  "wisdom" integer
-  "constituition" integer
-  "intelligence" integer
-  "dexterity" integer
-  "strength" integer
+  "wisdom" integer [not null, default: 0, note: "Armazena a quantidade de sabedoria que será deduzida/somada do personagem"]
+  "charisma" integer [not null, default: 0, note: "Armazena a carisma de sabedoria que será deduzida/somada do personagem"]
+  "constitution" integer [not null, default: 0, note: "Armazena a constituição de sabedoria que será deduzida/somada do personagem"]
+  "dexterity" integer [not null, default: 0, note: "Armazena a destreza de sabedoria que será deduzida/somada do personagem"]
+  "strength" integer [not null, default: 0, note: "Armazena a força de sabedoria que será deduzida/somada do personagem"]
+  "intelligence" integer [not null, default: 0, note: "Armazena a inteligência de sabedoria que será deduzida/somada do personagem"]
+
+  note: '''
+    # <h1 align="center">Modificadores</h1>
+    > Essa tabela guarda modificações que serão aplicadas nos atributos puro/base do personagem durante uma determinada batalha
+  '''
 }
 
 Table "Boss" {
   "id" uuid [pk, ref: - Enemy.id]
   
   modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
+
+  note: '''
+    # <h1 align="center">Chefe de batalha</h1>
+    > Essa tabela representa um chefe de uma determinada batalha, um inimigo final mais poderoso
+  '''
 }
 
 Table Boss_Item {
   item uuid [pk, ref: - Item.id]
   boss uuid [pk, ref: - Boss.id]
-  amount integer
+  amount integer [not null]
 }
 
 Table "Siege" {
   "id" uuid [pk, ref: - Battle.id]
-  name text
+  name text [not null]
   boss uuid [ref: - Boss.id] 
+  guild uuid [ref: - Guild.id]
+
+  note: '''
+    # <h1 align="center">Cerco</h1>
+    > Essa tabela representa uma batalha realizada em equipe com uma guilda
+  '''
 }
