@@ -31,7 +31,7 @@ CREATE TABLE modifier (
 
 CREATE TABLE race (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   region text NOT NULL,
   lore text NOT NULL,
   modifier UUID,
@@ -41,7 +41,7 @@ CREATE TABLE race (
 
 CREATE TABLE class (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   modifier UUID,
 
   constraint fk_class_modifier FOREIGN key (modifier) REFERENCES modifier(id)
@@ -49,7 +49,7 @@ CREATE TABLE class (
 
 CREATE TABLE Craft (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   modifier UUID,
 
   constraint fk_craft_modifier FOREIGN key (modifier) REFERENCES modifier(id)
@@ -57,7 +57,7 @@ CREATE TABLE Craft (
 
 CREATE TABLE Item (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   description text NOT NULL,
   modifier UUID,
 
@@ -77,7 +77,7 @@ CREATE TABLE Craft_Item (
 
 CREATE TABLE Guild (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL
+  name text UNIQUE NOT NULL
 );
 
 CREATE TABLE Inventory (
@@ -98,7 +98,7 @@ CREATE TABLE Inventory_Item (
 
 CREATE TABLE Skill (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   description text NOT NULL,
   cost integer NOT NULL,
   effect text NOT NULL
@@ -106,7 +106,7 @@ CREATE TABLE Skill (
 
 CREATE TABLE Enemy (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   hp integer NOT NULL,
 
   attribute UUID,
@@ -116,7 +116,7 @@ CREATE TABLE Enemy (
 
 CREATE TABLE Environment (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
   region text NOT NULL,
 
   modifier UUID,
@@ -258,7 +258,7 @@ CREATE TABLE Boss_Item (
 
 CREATE TABLE Siege (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name text NOT NULL,
+  name text UNIQUE NOT NULL,
 
   boss UUID,
   guild UUID,

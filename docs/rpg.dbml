@@ -103,7 +103,7 @@ Table "Attribute" {
 
 Table "Race" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
   "region" text [not null, note: "Região de origem da raça"]
   "lore" text [not null, note: "Backstory da raça"]
 
@@ -117,7 +117,7 @@ Table "Race" {
 
 Table "Class" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
 
   modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
 
@@ -129,7 +129,7 @@ Table "Class" {
 
 Table "Craft" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
   
   modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
 
@@ -147,7 +147,7 @@ Table "Craft_Item" {
 
 Table "Guild" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
 
   note: '''
     # <h1 align="center">Guilda</h1>
@@ -172,7 +172,7 @@ Table Inventory_Item {
 
 Table "Item" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
   "description" text [not null]
   
   modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera no personagem"]
@@ -185,7 +185,7 @@ Table "Item" {
 
 Table "Skill" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
   "description" text [not null, note: "A descrição de utilização e efeitos da habilidade"]
   "cost" integer [not null, note: "Determina o custo de utilização de determinada habilidade"]
   "effect" text [not null, note: "Um balança de consequências do uso da habilidade"]
@@ -213,7 +213,7 @@ Table Skill_Enemy {
 
 Table "Enemy" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
   "hp" integer [not null, note: "Guarda o HP (pontos de vida) máximo desse inimigo"]
 
   attribute uuid [ref: - Attribute.id]
@@ -226,7 +226,7 @@ Table "Enemy" {
 
 Table "Environment" {
   "id" uuid [pk]
-  "name" text [not null]
+  "name" text [unique, not null]
   "region" text [not null, note: "Região onde se encontra esse ambiente"]
   
   modifier uuid [ref: - Modifier.id, note: "Modificação de atributos que essa tabela altera nos personagens e inimigos"]
@@ -315,7 +315,7 @@ Table Boss_Item {
 
 Table "Siege" {
   "id" uuid [pk, ref: - Battle.id]
-  name text [not null]
+  name text [unique, not null]
   boss uuid [ref: - Boss.id] 
   guild uuid [ref: - Guild.id]
 
